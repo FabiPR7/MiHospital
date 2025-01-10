@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "403096573032",
+    "project_id": "mihospitalapp-77e15",
+    "storage_bucket": "mihospitalapp-77e15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403096573032:android:91de9a08b898248d61d7dd",
+        "android_client_info": {
+          "package_name": "com.example.mihospitalapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-QYxv4f3FOr5VEcI4C4G-O4BZ0CeEwBk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

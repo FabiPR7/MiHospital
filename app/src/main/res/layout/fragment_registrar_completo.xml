@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".fragments.registrarCompleto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/aceptarButton1"
+            android:layout_width="153dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="360dp"
+            android:layout_marginEnd="88dp"
+            android:text="ACEPTAR"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="326dp"
+            android:layout_height="229dp"
+            android:layout_marginTop="124dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/reigstrouno"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/correoRegistro1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginEnd="12dp"
+            android:ems="10"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView4" />
+
+        <ImageView
+            android:id="@+id/iniciarSesionButon1"
+            android:layout_width="196dp"
+            android:layout_height="88dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginEnd="132dp"
+            android:src="@drawable/iniciarsesionazul"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/registrateButon1"
+            android:layout_width="133dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/registrarboton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/contrasenaRegistro1"
+            android:layout_width="176dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginEnd="4dp"
+            android:ems="10"
+            android:inputType="textPassword"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/correoRegistro1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
