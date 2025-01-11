@@ -1,5 +1,7 @@
 package com.example.mihospitalapp.modelo;
 
+import androidx.annotation.NonNull;
+
 public class Personal {
     private String nombre;
     private String apellido;
@@ -58,5 +60,11 @@ public class Personal {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Nombre:"+nombre+" Apellido:"+apellido+" Codigo:"+codigo;
     }
 }

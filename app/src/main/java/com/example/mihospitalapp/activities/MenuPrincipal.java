@@ -17,19 +17,22 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mihospitalapp.R;
 import com.example.mihospitalapp.modelo.GestorBD;
+import com.example.mihospitalapp.modelo.PersonalRepository;
 
 public class MenuPrincipal extends AppCompatActivity {
 
     private TextView nombre, hospital;
     private Switch aSwitchMenu;
     private ImageView personalB, pacientesB,tareasB,habitacionesB,ajustesB,perfilB;
-
+    private PersonalRepository pr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_menu_principal);
+        pr = new PersonalRepository();
+        pr.procesoAllPersonal(new GestorBD(this));
         nombre = findViewById(R.id.nombreMenu);
         hospital = findViewById(R.id.hopsitalMenu);
         aSwitchMenu = findViewById(R.id.switchMenu);
