@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         miGestor = new GestorBD(this);
+       estaRegistrado();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(MainActivity.this, MenuPrincipal.class);
             startActivity(i);
         }
+
 
 
     }
