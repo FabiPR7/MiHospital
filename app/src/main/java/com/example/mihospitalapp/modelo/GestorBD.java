@@ -27,7 +27,7 @@ public class GestorBD {
     }
 
     public void insertarPersonal(Personal personal){
-        mDatabase.child("Personal").push().setValue(personal)
+        mDatabase.child("personal").push().setValue(personal)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // Operación exitosa
@@ -48,6 +48,7 @@ public class GestorBD {
     // Insertar el usuario
     public long insertUsuario(Usuario user) {
         ContentValues values = new ContentValues();
+        values.put(mySQLite.ID, user.getCodigo());
         values.put(mySQLite.NOMBRE, user.getNombre());
         values.put(mySQLite.APELLIDO, user.getApellido());
         values.put(mySQLite.ESTADO_ACTIVO, user.isEstaActivo() ? 1 : 0);
@@ -64,23 +65,22 @@ public class GestorBD {
         return filasAfectadas > 0;
     }
 
-    public boolean isUserRegistered(int userId) {
-        Cursor cursor = database.query(mySQLite.TABLE_NAME,
-                new String[]{mySQLite.ESTADO_REGISTRADO},
-                mySQLite.ID + " = ?",
-                new String[]{String.valueOf(userId)},
-                null, null, null);
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                @SuppressLint("Range") int registrado = cursor.getInt(cursor.getColumnIndex(mySQLite.ESTADO_REGISTRADO));
-                cursor.close();
-                return registrado == 1;
+    public boolean isTableNotEmpty() {
+        Cursor cursor = null;
+        try {
+            cursor = database.rawQuery("SELECT COUNT(*) FROM " + mySQLite.TABLE_NAME, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0); // Obtiene el valor del primer campo (conteo de filas)
+                return count > 0;
             }
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Asegúrate de cerrar el cursor
+            }
         }
-        return false;
+        return false; // Retorna false si no hay registros o ocurre algún error
     }
+
 
 
     public boolean isUserActive(int userId) {

@@ -82,7 +82,7 @@ public class registrarCompleto extends Fragment {
     }
 
     public void verificarInformacion(){
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Personal");
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("personal");
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -92,14 +92,13 @@ public class registrarCompleto extends Fragment {
                     String contrasenaDb = snapshot.child("contraseña").getValue(String.class);
                     if (correo.getText().toString().equals(correoDb) && contrasena.getText().toString()                         .equals(contrasenaDb)) {
                         loginExitoso = true;
-                        Usuario user = new Usuario(snapshot.child("nombre").getValue(String.class),snapshot.child("apellido").getValue(String.class),true,true);
+                        Usuario user = new Usuario(snapshot.child("codigo").getValue(String.class),snapshot.child("nombre").getValue(String.class),snapshot.child("apellido").getValue(String.class),true,true);
                         miGestor.insertUsuario(user);
                         break;
                     }
                 }
                 if (loginExitoso) {
                     Toast.makeText(getContext(), "SI FUNCIONO", Toast.LENGTH_SHORT).show();
-
                     Log.d("Firebase", "Inicio de sesión exitoso");
                     // Redirigir al usuario o mostrar un mensaje
                 } else {

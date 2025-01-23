@@ -2,8 +2,10 @@ package com.example.mihospitalapp.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +15,28 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.mihospitalapp.R;
+import com.example.mihospitalapp.activities.PersonalActivty;
 import com.example.mihospitalapp.modelo.GestorBD;
 import com.example.mihospitalapp.modelo.Personal;
+import com.example.mihospitalapp.modelo.PersonalRepository;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 
 public class registrateCompleto2 extends Fragment {
+
     private ImageView iniciarsesion;
     private Button aceptar;
     private EditText nombre,apellido,correo,contrasena,confirmacontra,codigo;
-
+    private ArrayList<String> hospitalCodes;
+    private ArrayList<String> personalCodes;
+    private GestorBD migestor;
     public registrateCompleto2() {
         // Required empty public constructor
     }
@@ -44,7 +59,27 @@ public class registrateCompleto2 extends Fragment {
         contrasena = view.findViewById(R.id.contrasenaRegistro2);
         confirmacontra= view.findViewById(R.id.cofnirmacontrRegistro2);
         codigo = view.findViewById(R.id.codigoRegistro2);
+        hospitalCodes = new ArrayList<>();
+        personalCodes = new ArrayList<>();
+        migestor = new GestorBD(getContext());
+        // Obtener códigos de hospital
         aceptar = view.findViewById(R.id.aceptarButton2);
+        fetchHospitalCodes(success -> {
+            if (success) {
+                System.out.println("All Hospitales  Hecho");
+                System.out.println(hospitalCodes.toString());
+            } else {
+                System.out.println("Error o datos no encontrados.");
+            }
+        });
+        fetchPersonalCodes(success -> {
+            if (success) {
+                System.out.println("All personal  Hecho");
+                System.out.println(personalCodes.toString());
+            } else {
+                System.out.println("Error o datos no encontrados.");
+            }
+        });
         aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,6 +94,58 @@ public class registrateCompleto2 extends Fragment {
         });
         return view;
     }
+    public interface OnCompleteListener {
+        void onComplete(boolean success);
+    }
+
+    private void fetchHospitalCodes(OnCompleteListener listener) {
+        DatabaseReference hospitales = FirebaseDatabase.getInstance().getReference("hospitales");
+        hospitales.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                hospitalCodes.clear(); // Limpiar lista para evitar duplicados
+                for (DataSnapshot hospitalSnapshot : snapshot.getChildren()) {
+                    String codigo = hospitalSnapshot.child("codigo").getValue(String.class);
+                    if (codigo != null) {
+                        hospitalCodes.add(codigo);
+                    }
+                }
+                listener.onComplete(true);
+                Log .d("HospitalCodes", "Códigos: " + hospitalCodes);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("FirebaseError", "Error al obtener los datos: " + error.getMessage());
+            listener.onComplete(false);
+            }
+        });
+    }
+
+    private void fetchPersonalCodes(OnCompleteListener listener) {
+        DatabaseReference hospitales = FirebaseDatabase.getInstance().getReference("personal");
+        hospitales.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                personalCodes.clear(); // Limpiar lista para evitar duplicados
+                for (DataSnapshot hospitalSnapshot : snapshot.getChildren()) {
+                    String codigo = hospitalSnapshot.child("codigo").getValue(String.class);
+                    if (codigo != null) {
+                        personalCodes.add(codigo);
+                    }
+                }
+                listener.onComplete(true);
+                Log .d("HospitalCodes", "Códigos: " + hospitalCodes);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("FirebaseError", "Error al obtener los datos: " + error.getMessage());
+                listener.onComplete(false);
+            }
+        });
+    }
+
     public void cambiarFragment(View view){
         ImageView imageView = view.findViewById(R.id.iniciarSesionButon2);
         imageView.setOnClickListener(v -> {
@@ -72,7 +159,7 @@ public class registrateCompleto2 extends Fragment {
     public void aceptar(){
         if (verificarInformacion()){
             insertar();
-            Toast.makeText(this.getContext(), "Se agrego correctamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), "Se agrego correctamente, ahora accede con tus datos", Toast.LENGTH_SHORT).show();
         }
         else{
          System.out.println("ERROR EN ALGO");
@@ -108,7 +195,36 @@ public class registrateCompleto2 extends Fragment {
             Toast.makeText(this.getContext(), "Formato de correo incorrecto", Toast.LENGTH_SHORT).show();
             return false;
         }
+        boolean formatoCodigo = Pattern.matches("^.+-.+$", codigo.getText().toString());
+        if (!formatoCodigo){
+            Toast.makeText(this.getContext(), "Formato de codigo incorrecto", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        String[] codes = codigo.getText().toString().split("-");
+        System.out.println("-"+codes[1]+"-");
+        System.out.println("-"+codes[0]+"-");
+       boolean codigoPersonalFomrato = Pattern.matches("^\\d{4}$", codes[1]);
+        if (!codigoPersonalFomrato){
+            Toast.makeText(this.getContext(), "Formato de codigo personal", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+       boolean codigoPersonal = personalCodes.contains(codigo.getText().toString());
+        if (codigoPersonal){
+            Toast.makeText(this.getContext(), "Este codigo ya esta en uso", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        boolean codigoHospitalFormato = Pattern.matches("^H\\d{3}$",codes[0]);
+        if (!codigoHospitalFormato){
+            Toast.makeText(this.getContext(), "Formato de codigo de hospital incorrecto", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        boolean codigoHospital = hospitalCodes.contains(codes[0]);
+        if (!codigoHospital){
+            Toast.makeText(this.getContext(), "Codigo Incorrecto (no hay hospital con este codigo)", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         return true;
+
     }
 
     public void insertar(){
@@ -118,7 +234,7 @@ public class registrateCompleto2 extends Fragment {
         c = correo.getText().toString();
         cn1 = contrasena.getText().toString();
         cod = codigo.getText().toString();
-        Personal p = new Personal(n,a,c,cn1,cod);
+        Personal p = new Personal(n,a,c,cn1,cod,"activo");
         GestorBD gestorBD = new GestorBD(getContext());
         gestorBD.insertarPersonal(p);
     }

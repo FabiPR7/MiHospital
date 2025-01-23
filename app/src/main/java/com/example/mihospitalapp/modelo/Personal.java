@@ -8,17 +8,19 @@ public class Personal {
     private String correo;
     private String contraseña;
     private String codigo;
+    private String estado;
 
     // Constructor vacío
     public Personal() {}
 
     // Constructor con parámetros
-    public Personal(String nombre, String apellido, String correo, String contraseña, String codigo) {
+    public Personal(String nombre, String apellido, String correo, String contraseña, String codigo,String estado) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
         this.contraseña = contraseña;
         this.codigo = codigo;
+        this.estado = estado;
     }
 
     // Getters y Setters
@@ -60,6 +62,14 @@ public class Personal {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     @NonNull

@@ -2,11 +2,13 @@ package com.example.mihospitalapp.modelo;
 
 public class Usuario {
     private String nombre;
+    private String codigo;
     private String apellido;
     private boolean estaActivo;
     private boolean estaRegistrado;
 
-    public Usuario(String nombre, String apellido, boolean estaActivo, boolean estaRegistrado) {
+    public Usuario(String codigo,String nombre, String apellido, boolean estaActivo, boolean estaRegistrado) {
+        this.codigo = codigo;
         this.nombre = nombre;
         this.apellido = apellido;
         this.estaActivo = estaActivo;
@@ -16,6 +18,14 @@ public class Usuario {
     // Getters y setters
     public String getNombre() {
         return nombre;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public void setNombre(String nombre) {

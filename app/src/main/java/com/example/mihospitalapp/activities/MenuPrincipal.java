@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.mihospitalapp.R;
 import com.example.mihospitalapp.modelo.GestorBD;
 import com.example.mihospitalapp.modelo.PersonalRepository;
+import com.example.mihospitalapp.modelo.UsuarioRepository;
 
 public class MenuPrincipal extends AppCompatActivity {
 
@@ -32,7 +33,6 @@ public class MenuPrincipal extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_menu_principal);
         pr = new PersonalRepository();
-        pr.procesoAllPersonal(new GestorBD(this));
         nombre = findViewById(R.id.nombreMenu);
         hospital = findViewById(R.id.hopsitalMenu);
         aSwitchMenu = findViewById(R.id.switchMenu);
@@ -72,10 +72,19 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     public void colocarNombres(){
+        UsuarioRepository ur = new UsuarioRepository();
         GestorBD gestor = new GestorBD(this);
         String nombreCompleto = gestor.nombreCompletoUsuario();
         nombre.setText(nombreCompleto);
-        hospital.setText("San Pedro");
+        String[] codigo = ur.obtenerCodigo(gestor).split("-");
+        ur.obtenerNombreHospital(codigo[0], success -> {
+            if (success) {
+                System.out.println("ChachiPiruli");
+                hospital.setText(ur.getNombreHospital());
+            } else {
+                System.out.println("Error o datos no encontrados.");
+            }
+        });
     }
 
     public void verificarSwitch(){
@@ -93,6 +102,7 @@ public class MenuPrincipal extends AppCompatActivity {
         view.setVisibility(View.INVISIBLE);
         view.setEnabled(false);
         gestorBD.cambiarEstadoUsuario(1,false,true);
+
       }
       else {
           view.setVisibility(View.VISIBLE);

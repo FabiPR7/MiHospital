@@ -21,26 +21,39 @@ import com.example.mihospitalapp.modelo.Personal;
 import com.example.mihospitalapp.modelo.PersonalRepository;
 
 public class PersonalActivty extends AppCompatActivity {
+
    private  RecyclerView recyclerView;
    private PersonalRepository pr;
-   private Personal[] personal;
-    @Override
+   private Personal[] personal = new Personal[0];
+
+   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_personal);
         pr = new PersonalRepository();
         GestorBD gestorBD = new GestorBD(this);
-        personal = pr.allPersonal(gestorBD);
-        recyclerView = findViewById(R.id.recyclerPersonal);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new miAdapter());
+       recyclerView = findViewById(R.id.recyclerPersonal);
+       LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+       recyclerView.setLayoutManager(linearLayoutManager);
+        pr.allPersonal(gestorBD, success -> {
+           if (success) {
+               System.out.println("All personal en Activity");
+               personal = pr.getPersonals().toArray(new Personal[0]);
+               recyclerView.setAdapter(new miAdapter());
+           } else {
+               System.out.println("Error o datos no encontrados.");
+           }
+       });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    public interface OnCompleteListener {
+        void onComplete(boolean success);
     }
 
     private class miAdapter extends RecyclerView.Adapter<miAdapter.miAdapterHolder> {
@@ -61,8 +74,10 @@ public class PersonalActivty extends AppCompatActivity {
         }
 
         private class miAdapterHolder extends RecyclerView.ViewHolder{
+
             ImageView estado,barra;
             TextView nombre;
+
             public miAdapterHolder(@NonNull View itemView) {
                 super(itemView);
                barra = itemView.findViewById(R.id.barraPersonalRecycler);
@@ -72,8 +87,13 @@ public class PersonalActivty extends AppCompatActivity {
 
             public void imprimir(int position) {
                 barra.setImageResource(R.drawable.barrapersonalreclyer);
-                estado.setImageResource(R.drawable.personalactivo);
-                nombre.setText(personal[position].getNombre());
+               if (personal[position].getEstado().equalsIgnoreCase("activo")){
+                   estado.setImageResource(R.drawable.personalactivo);
+               }
+                else{
+                   estado.setImageResource(R.drawable.personalnoactivo);
+               }
+                nombre.setText(personal[position].getNombre()+" "+personal[position].getApellido());
             }
         }
     }

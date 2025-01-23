@@ -11,30 +11,31 @@ import com.google.firebase.database.core.Context;
 import java.util.ArrayList;
 
 public class PersonalRepository {
-    Personal[] personalArray = new Personal[0];
     ArrayList<Personal> personals = new ArrayList<>();
-    public PersonalRepository(){
 
+    public PersonalRepository(){
     }
-    public void procesoAllPersonal(GestorBD gestorBD){
+
+    public void procesoAllPersonal(GestorBD gestorBD, OnCompleteListener listener){
         String codigo = "H001";
         gestorBD.getmDatabase().
                 child("personal").
                 orderByChild("codigo").
                 startAt(codigo).
                 addListenerForSingleValueEvent(new ValueEventListener() {
-
             @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (!snapshot.exists()) {
                             System.out.println("No se encontraron datos para el código: " + codigo);
+                            listener.onComplete(false);
                             return;
                         }
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                             Personal personal = dataSnapshot.getValue(Personal.class);
                             personals.add(personal);
-                            System.out.println(personal.toString());
                         }
+                       listener.onComplete(true);
+
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -43,13 +44,24 @@ public class PersonalRepository {
                 });
     }
 
-    public Personal[] allPersonal(GestorBD gestorBD){
-       personalArray = new Personal[personals.size()];
-       int count = 0;
-        for (Personal personal : personals){
-           personalArray[count] = personal;
-           count++;
-       }
-        return  personalArray;
+    public void allPersonal(GestorBD gestorBD, OnCompleteListener listener){
+        procesoAllPersonal(gestorBD, success -> {
+            if (success) {
+                System.out.println(personals.toString());
+                listener.onComplete(true);
+
+            } else {
+                listener.onComplete(false);
+                System.out.println("Error o datos no encontrados.");
+            }
+        });
+    }
+
+    public interface OnCompleteListener {
+        void onComplete(boolean success);
+    }
+
+    public ArrayList<Personal> getPersonals() {
+        return personals;
     }
 }
