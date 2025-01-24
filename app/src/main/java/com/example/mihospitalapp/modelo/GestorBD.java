@@ -13,17 +13,17 @@ import com.google.firebase.database.FirebaseDatabase;
 public class GestorBD {
 
     private DatabaseReference mDatabase;
-    private SQLiteDatabase database;
+    private SQLiteDatabase sqlLiteWritable;
     private MySQLite mySQLite;
 
     public GestorBD(Context context){
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mySQLite = new MySQLite(context);
-        database = mySQLite.getWritableDatabase();
+        sqlLiteWritable = mySQLite.getWritableDatabase();
     }
     public GestorBD(){
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        database = mySQLite.getWritableDatabase();
+        sqlLiteWritable = mySQLite.getWritableDatabase();
     }
 
     public void insertarPersonal(Personal personal){
@@ -53,22 +53,21 @@ public class GestorBD {
         values.put(mySQLite.APELLIDO, user.getApellido());
         values.put(mySQLite.ESTADO_ACTIVO, user.isEstaActivo() ? 1 : 0);
         values.put(mySQLite.ESTADO_REGISTRADO, user.isEstaRegistrado() ? 1 : 0);
-        return database.insert(mySQLite.TABLE_NAME, null, values);
+        return sqlLiteWritable.insert(mySQLite.TABLE_NAME, null, values);
     }
 
-    public boolean cambiarEstadoUsuario(int id, boolean estaActivo, boolean estaRegistrado) {
+    public boolean cambiarEstadoUsuario(String codigo, boolean estaActivo) {
         ContentValues values = new ContentValues();
         values.put(mySQLite.ESTADO_ACTIVO, estaActivo ? 1 : 0);
-        values.put(mySQLite.ESTADO_REGISTRADO, estaRegistrado ? 1 : 0);
-        int filasAfectadas = database.update(mySQLite.TABLE_NAME, values,
-                mySQLite.ID + " = ?", new String[]{String.valueOf(id)});
+        int filasAfectadas = sqlLiteWritable.update(mySQLite.TABLE_NAME, values,
+                mySQLite.ID + " = ?", new String[]{String.valueOf(codigo)});
         return filasAfectadas > 0;
     }
 
     public boolean isTableNotEmpty() {
         Cursor cursor = null;
         try {
-            cursor = database.rawQuery("SELECT COUNT(*) FROM " + mySQLite.TABLE_NAME, null);
+            cursor = sqlLiteWritable.rawQuery("SELECT COUNT(*) FROM " + mySQLite.TABLE_NAME, null);
             if (cursor != null && cursor.moveToFirst()) {
                 int count = cursor.getInt(0); // Obtiene el valor del primer campo (conteo de filas)
                 return count > 0;
@@ -83,11 +82,11 @@ public class GestorBD {
 
 
 
-    public boolean isUserActive(int userId) {
-        Cursor cursor = database.query(MySQLite.TABLE_NAME,
+    public boolean isUserActive(String codigo) {
+        Cursor cursor = sqlLiteWritable.query(MySQLite.TABLE_NAME,
                 new String[]{MySQLite.ESTADO_ACTIVO},
                 MySQLite.ID + " = ?",
-                new String[]{String.valueOf(userId)},
+                new String[]{String.valueOf(codigo)},
                 null, null, null);
 
         if (cursor != null) {
@@ -103,7 +102,7 @@ public class GestorBD {
 
     public String nombreCompletoUsuario() {
         String fullName = null;
-        Cursor cursor = database.query(mySQLite.TABLE_NAME,
+        Cursor cursor = sqlLiteWritable.query(mySQLite.TABLE_NAME,
                 new String[]{mySQLite.NOMBRE, mySQLite.APELLIDO},
                 null,
                 null,
@@ -121,7 +120,9 @@ public class GestorBD {
         }
         return fullName;
     }
-
+    public DatabaseReference getPersonalReference(){
+        return FirebaseDatabase.getInstance().getReference("personal");
+    }
 
     public DatabaseReference getmDatabase() {
         return mDatabase;
@@ -132,6 +133,6 @@ public class GestorBD {
     }
 
     public SQLiteDatabase getDatabase() {
-        return database;
+        return sqlLiteWritable;
     }
 }

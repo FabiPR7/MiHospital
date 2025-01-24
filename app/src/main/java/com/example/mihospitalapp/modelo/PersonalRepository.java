@@ -16,8 +16,7 @@ public class PersonalRepository {
     public PersonalRepository(){
     }
 
-    public void procesoAllPersonal(GestorBD gestorBD, OnCompleteListener listener){
-        String codigo = "H001";
+    public void allPersonal(GestorBD gestorBD, String codigo, OnCompleteListener listener){
         gestorBD.getmDatabase().
                 child("personal").
                 orderByChild("codigo").
@@ -42,19 +41,6 @@ public class PersonalRepository {
                         System.out.println("ERROR MI REY");
                     }
                 });
-    }
-
-    public void allPersonal(GestorBD gestorBD, OnCompleteListener listener){
-        procesoAllPersonal(gestorBD, success -> {
-            if (success) {
-                System.out.println(personals.toString());
-                listener.onComplete(true);
-
-            } else {
-                listener.onComplete(false);
-                System.out.println("Error o datos no encontrados.");
-            }
-        });
     }
 
     public interface OnCompleteListener {

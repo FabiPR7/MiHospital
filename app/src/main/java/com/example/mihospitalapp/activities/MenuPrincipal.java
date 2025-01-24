@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mihospitalapp.R;
 import com.example.mihospitalapp.modelo.GestorBD;
+import com.example.mihospitalapp.modelo.HospitalRepository;
 import com.example.mihospitalapp.modelo.PersonalRepository;
 import com.example.mihospitalapp.modelo.UsuarioRepository;
 
@@ -26,6 +27,10 @@ public class MenuPrincipal extends AppCompatActivity {
     private Switch aSwitchMenu;
     private ImageView personalB, pacientesB,tareasB,habitacionesB,ajustesB,perfilB;
     private PersonalRepository pr;
+    private UsuarioRepository ur;
+    private HospitalRepository hr;
+    private String codigoPersonal;
+    private GestorBD gestorBD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,8 @@ public class MenuPrincipal extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_menu_principal);
         pr = new PersonalRepository();
+        ur = new UsuarioRepository();
+        hr = new HospitalRepository();
         nombre = findViewById(R.id.nombreMenu);
         hospital = findViewById(R.id.hopsitalMenu);
         aSwitchMenu = findViewById(R.id.switchMenu);
@@ -42,15 +49,16 @@ public class MenuPrincipal extends AppCompatActivity {
         habitacionesB = findViewById(R.id.habitacionesButton);
         ajustesB = findViewById(R.id.ajustesButton);
         perfilB = findViewById(R.id.perfilButton);
+        gestorBD = new GestorBD(this);
+        codigoPersonal = ur.obtenerCodigo(gestorBD);
         colocarNombres();
-        GestorBD gestorBD = new GestorBD(this);
         personalB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 activityPersonal();
             }
         });
-        if (gestorBD.isUserActive(1)){
+        if (gestorBD.isUserActive(codigoPersonal)){
             aSwitchMenu.setChecked(true);
         }
         verificarSwitch();
@@ -72,15 +80,12 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     public void colocarNombres(){
-        UsuarioRepository ur = new UsuarioRepository();
-        GestorBD gestor = new GestorBD(this);
-        String nombreCompleto = gestor.nombreCompletoUsuario();
+        String nombreCompleto = ur.nombreCompletoUsuario(gestorBD);
         nombre.setText(nombreCompleto);
-        String[] codigo = ur.obtenerCodigo(gestor).split("-");
-        ur.obtenerNombreHospital(codigo[0], success -> {
+        hr.obtenerNombreHospital(hr.obtenerCodigoHospital(codigoPersonal), success -> {
             if (success) {
                 System.out.println("ChachiPiruli");
-                hospital.setText(ur.getNombreHospital());
+                hospital.setText(hr.getNombreHospital());
             } else {
                 System.out.println("Error o datos no encontrados.");
             }
@@ -97,17 +102,17 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     public void habilitarOdeshabilitar(View view){
-        GestorBD gestorBD = new GestorBD(this);
       if (!aSwitchMenu.isChecked()){
         view.setVisibility(View.INVISIBLE);
         view.setEnabled(false);
-        gestorBD.cambiarEstadoUsuario(1,false,true);
-
+        gestorBD.cambiarEstadoUsuario(ur.obtenerCodigo(gestorBD),false);
+       ur.cambiarEstadoFirebase(codigoPersonal,"no activo",gestorBD);
       }
       else {
           view.setVisibility(View.VISIBLE);
           view.setEnabled(true);
-          gestorBD.cambiarEstadoUsuario(1,true,true);
+          gestorBD.cambiarEstadoUsuario(codigoPersonal,true);
+          ur.cambiarEstadoFirebase(codigoPersonal,"activo",gestorBD);
       }
     }
 

@@ -33,7 +33,6 @@ public class UsuarioRepository {
             if (cursor != null && cursor.moveToFirst()) {
                 do {
                     codigo = cursor.getString(cursor.getColumnIndex("codigo"));
-                    System.out.println("Código: " + codigo);
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
@@ -50,40 +49,49 @@ public class UsuarioRepository {
         void onComplete(boolean result);
     }
 
-    private  String nombreHospital;
-
-    public String getNombreHospital() {
-        return nombreHospital;
-    }
-
-    public String obtenerNombreHospital(String codigoBuscado, OnCompleteListener listener) {
-        DatabaseReference hospitalesRef = FirebaseDatabase.getInstance().getReference("hospitales");
-        hospitalesRef.orderByChild("codigo").equalTo(codigoBuscado).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot hospitalSnapshot : snapshot.getChildren()) {
-                         nombreHospital = hospitalSnapshot.child("nombre").getValue(String.class);
-                        if (nombreHospital != null) {
-                            listener.onComplete(true); // Devuelve el nombre del hospit
+    public void cambiarEstadoFirebase(String codigo, String estado,GestorBD gestor){
+        gestor.getPersonalReference().orderByChild("codigo").equalTo(codigo)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // Recorrer los nodos encontrados
+                            for (DataSnapshot child : snapshot.getChildren()) {
+                                // Actualizar el campo "estado" del nodo correspondiente
+                                child.getRef().child("estado").setValue(estado)
+                                        .addOnSuccessListener(aVoid -> System.out.println("Estado cambiado correctamente para el código: " + codigo))
+                                        .addOnFailureListener(e -> System.out.println("Error al cambiar el estado: " + e.getMessage()));
+                            }
+                        } else {
+                            System.out.println("El código especificado no existe en la tabla personal.");
                         }
                     }
-                }
-                listener.onComplete(false); // Código no encontrado
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("FirebaseError", "Error al obtener el hospital: " + error.getMessage());
-                listener.onComplete(false); // Maneja errores
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        System.out.println("Error en la consulta: " + error.getMessage());
+                    }
+                });
+    }
+    public String nombreCompletoUsuario(GestorBD gestor) {
+        String fullName = null;
+        Cursor cursor = gestor.getMySQLite().getWritableDatabase().query(gestor.getMySQLite().TABLE_NAME,
+                new String[]{gestor.getMySQLite().NOMBRE, gestor.getMySQLite().APELLIDO},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                @SuppressLint("Range") String nombre = cursor.getString(cursor.getColumnIndex(MySQLite.NOMBRE));
+                @SuppressLint("Range") String apellido = cursor.getString(cursor.getColumnIndex(MySQLite.APELLIDO));
+                fullName = nombre + " " + apellido;
             }
-        });
-        if (nombreHospital!=null){
-            return nombreHospital;
+            cursor.close();
         }
-        else {
-            return "";
-        }
+        return fullName;
     }
 
 }

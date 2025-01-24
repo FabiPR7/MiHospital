@@ -1,8 +1,12 @@
 package com.example.mihospitalapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,47 +21,128 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mihospitalapp.R;
 import com.example.mihospitalapp.modelo.GestorBD;
+import com.example.mihospitalapp.modelo.HospitalRepository;
 import com.example.mihospitalapp.modelo.Personal;
 import com.example.mihospitalapp.modelo.PersonalRepository;
+import com.example.mihospitalapp.modelo.UsuarioRepository;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Locale;
 
 public class PersonalActivty extends AppCompatActivity {
 
-   private  RecyclerView recyclerView;
+   private RecyclerView recyclerView;
    private PersonalRepository pr;
-   private Personal[] personal = new Personal[0];
+   private UsuarioRepository ur;
+   private HospitalRepository hr;
+   private Personal[] personal;
+   private ArrayList<Personal> ordenados;
+   private GestorBD gestorBD;
+   private EditText buscador;
+   private ImageView mensajeButon;
 
-   @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_personal);
+        gestorBD = new GestorBD(this);
         pr = new PersonalRepository();
-        GestorBD gestorBD = new GestorBD(this);
+        ur = new UsuarioRepository();
+        hr = new HospitalRepository();
+        personal = new Personal[0];
+        ordenados = new ArrayList<>();
+        buscador = findViewById(R.id.buscadorTxt);
+        mensajeButon = findViewById(R.id.mensajeGrupal);
+        mensajeButon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activityMensaje();
+            }
+        });
        recyclerView = findViewById(R.id.recyclerPersonal);
        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
        recyclerView.setLayoutManager(linearLayoutManager);
-        pr.allPersonal(gestorBD, success -> {
-           if (success) {
-               System.out.println("All personal en Activity");
-               personal = pr.getPersonals().toArray(new Personal[0]);
-               recyclerView.setAdapter(new miAdapter());
-           } else {
-               System.out.println("Error o datos no encontrados.");
-           }
-       });
+       obtenerPersonalAll();
+        buscador.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                buscar(success -> {
+                    if(success){
+
+                    }
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
     }
+    public void activityMensaje(){
+        Intent i = new Intent(PersonalActivty.this, MensajeActivity.class);
+        startActivity(i);
+    }
+    public void buscar(PersonalRepository.OnCompleteListener listener){
+        String buscar = buscador.getText().toString().toLowerCase();
+        HashSet<Personal> personalBuscado = new HashSet<>();
+        if (!buscar.isEmpty()){
+            for (Personal personal1 : personal){
+                if (personal1.getNombre().toLowerCase().startsWith(buscar)||personal1.getApellido().toLowerCase().startsWith(buscar))
+                     personalBuscado.add(personal1);
+            }
+            recyclerView.setAdapter(new miAdapter(personalBuscado.toArray(new Personal[0])));
+        }
+        else{
+           ejecutarReciclerview();
+        }
+    }
+    public void ejecutarReciclerview(){
+        recyclerView.setAdapter(new miAdapter(personal));
+    }
 
-    public interface OnCompleteListener {
-        void onComplete(boolean success);
+    public void obtenerPersonalAll(){
+        pr.allPersonal(gestorBD,hr.obtenerCodigoHospital(ur.obtenerCodigo(gestorBD)) ,success -> {
+            if (success) {
+                ordenados = new ArrayList<>();
+                personal = pr.getPersonals().toArray(new Personal[0]);
+                for(Personal persona : personal){
+                    if (persona.getEstado().equalsIgnoreCase("activo")) {
+                        ordenados.add(persona);
+                    }
+                }
+                for(Personal persona : personal){
+                    if (persona.getEstado().equalsIgnoreCase("no activo")) {
+                        ordenados.add(persona);
+                    }
+                }
+                personal = ordenados.toArray(new Personal[0]);
+                ejecutarReciclerview();
+            } else {
+                System.out.println("Error o datos no encontrados.");
+            }
+        });
     }
 
     private class miAdapter extends RecyclerView.Adapter<miAdapter.miAdapterHolder> {
 
+        private Personal[] personalAdapter;
+
+        public miAdapter(Personal[] personalAdapter){
+            this.personalAdapter = personalAdapter;
+        }
         @NonNull
         @Override
         public miAdapterHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -70,7 +155,7 @@ public class PersonalActivty extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return personal.length;
+            return personalAdapter.length;
         }
 
         private class miAdapterHolder extends RecyclerView.ViewHolder{
@@ -87,13 +172,13 @@ public class PersonalActivty extends AppCompatActivity {
 
             public void imprimir(int position) {
                 barra.setImageResource(R.drawable.barrapersonalreclyer);
-               if (personal[position].getEstado().equalsIgnoreCase("activo")){
+               if (personalAdapter[position].getEstado().equalsIgnoreCase("activo")){
                    estado.setImageResource(R.drawable.personalactivo);
                }
                 else{
                    estado.setImageResource(R.drawable.personalnoactivo);
                }
-                nombre.setText(personal[position].getNombre()+" "+personal[position].getApellido());
+                nombre.setText(personalAdapter[position].getNombre()+" "+personalAdapter[position].getApellido());
             }
         }
     }
