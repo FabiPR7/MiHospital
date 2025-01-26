@@ -1,5 +1,7 @@
 package com.example.mihospitalapp.modelo;
 
+import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -27,7 +29,9 @@ public class HospitalRepository {
                         }
                     }
                 }
-                listener.onComplete(false); // Código no encontrado
+                else{
+                    listener.onComplete(false); // Código no encontrado
+                }
             }
 
             @Override
@@ -51,5 +55,43 @@ public class HospitalRepository {
 
     public String getNombreHospital() {
         return nombreHospital;
+    }
+    public String nombreHospitalMysqlite(GestorBD gestor) {
+        String nombre = null;
+        Cursor cursor = gestor.getDatabase().query("hospital",
+                new String[]{"nombre"},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                @SuppressLint("Range") String nombreH = cursor.getString(cursor.getColumnIndex("nombre"));
+                nombre = nombreH;
+            }
+            cursor.close();
+        }
+        return nombre;
+    }
+    public String codigoHospitalMysqlite(GestorBD gestor) {
+        String codigo = null;
+        Cursor cursor = gestor.getDatabase().query("hospital",
+                new String[]{"codigo"},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                @SuppressLint("Range") String codigoH = cursor.getString(cursor.getColumnIndex("nombre"));
+                codigo = codigoH;
+            }
+            cursor.close();
+        }
+        return codigo;
     }
 }

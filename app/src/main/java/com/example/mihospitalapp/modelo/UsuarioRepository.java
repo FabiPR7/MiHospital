@@ -1,6 +1,7 @@
 package com.example.mihospitalapp.modelo;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -49,6 +50,31 @@ public class UsuarioRepository {
         void onComplete(boolean result);
     }
 
+    public boolean verificaEstadoUsuario(String codigo,GestorBD gestor) {
+        Cursor cursor = gestor.getDatabase().query(MySQLite.TABLE_NAME,
+                new String[]{MySQLite.ESTADO_ACTIVO},
+                MySQLite.ID + " = ?",
+                new String[]{String.valueOf(codigo)},
+                null, null, null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                @SuppressLint("Range") int activo = cursor.getInt(cursor.getColumnIndex(MySQLite.ESTADO_ACTIVO));
+                cursor.close();
+                return activo == 1;
+            }
+            cursor.close();
+        }
+        return false;
+    }
+    public boolean cambiarEstadoUsuario(String codigo, boolean estaActivo,GestorBD gestor) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLite.ESTADO_ACTIVO, estaActivo ? 1 : 0);
+        int filasAfectadas = gestor.getDatabase().update(MySQLite.TABLE_NAME, values,
+                MySQLite.ID + " = ?", new String[]{String.valueOf(codigo)});
+        return filasAfectadas > 0;
+    }
+
     public void cambiarEstadoFirebase(String codigo, String estado,GestorBD gestor){
         gestor.getPersonalReference().orderByChild("codigo").equalTo(codigo)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -58,9 +84,7 @@ public class UsuarioRepository {
                             // Recorrer los nodos encontrados
                             for (DataSnapshot child : snapshot.getChildren()) {
                                 // Actualizar el campo "estado" del nodo correspondiente
-                                child.getRef().child("estado").setValue(estado)
-                                        .addOnSuccessListener(aVoid -> System.out.println("Estado cambiado correctamente para el código: " + codigo))
-                                        .addOnFailureListener(e -> System.out.println("Error al cambiar el estado: " + e.getMessage()));
+                                child.getRef().child("estado").setValue(estado);
                             }
                         } else {
                             System.out.println("El código especificado no existe en la tabla personal.");
@@ -75,8 +99,8 @@ public class UsuarioRepository {
     }
     public String nombreCompletoUsuario(GestorBD gestor) {
         String fullName = null;
-        Cursor cursor = gestor.getMySQLite().getWritableDatabase().query(gestor.getMySQLite().TABLE_NAME,
-                new String[]{gestor.getMySQLite().NOMBRE, gestor.getMySQLite().APELLIDO},
+        Cursor cursor = gestor.getDatabase().query(MySQLite.TABLE_NAME,
+                new String[]{MySQLite.NOMBRE, MySQLite.APELLIDO},
                 null,
                 null,
                 null,

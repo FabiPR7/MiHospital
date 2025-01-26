@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.example.mihospitalapp.R;
 import com.example.mihospitalapp.modelo.GestorBD;
+import com.example.mihospitalapp.modelo.Hospital;
+import com.example.mihospitalapp.modelo.HospitalRepository;
 import com.example.mihospitalapp.modelo.Usuario;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,7 +32,8 @@ public class registrarCompleto extends Fragment {
     private Button aceptar;
     private EditText correo, contrasena;
     private GestorBD miGestor;
-
+    private HospitalRepository hr;
+    public  boolean nombre;
     public registrarCompleto() {
         // Required empty public constructor
     }
@@ -46,11 +49,14 @@ public class registrarCompleto extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_registrar_completo, container, false);
+
         registrate = view.findViewById(R.id.registrateButon1);
         correo = view.findViewById(R.id.correoRegistro1);
         contrasena = view.findViewById(R.id.contrasenaRegistro1);
         aceptar = view.findViewById(R.id.aceptarButton1);
+        hr = new HospitalRepository();
         miGestor = new GestorBD(getContext());
+
         aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,7 +99,18 @@ public class registrarCompleto extends Fragment {
                     if (correo.getText().toString().equals(correoDb) && contrasena.getText().toString()                         .equals(contrasenaDb)) {
                         loginExitoso = true;
                         Usuario user = new Usuario(snapshot.child("codigo").getValue(String.class),snapshot.child("nombre").getValue(String.class),snapshot.child("apellido").getValue(String.class),true,true);
-                        miGestor.insertUsuario(user);
+                        String codigoHospital = hr.obtenerCodigoHospital(user.getCodigo());
+                        hr.obtenerNombreHospital(hr.obtenerCodigoHospital(user.getCodigo()),
+                                sucess -> {
+                                    if(sucess){
+                                        Hospital hospital = new Hospital(codigoHospital,hr.getNombreHospital());
+                                        miGestor.insertarHospital(hospital);
+                                    }
+                                    else{
+                                        System.out.println("Error al obtener nombre Hospital");
+                                    }
+                                });
+                        miGestor.insertarUsuario(user);
                         break;
                     }
                 }

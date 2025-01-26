@@ -46,7 +46,7 @@ public class GestorBD {
     }
 
     // Insertar el usuario
-    public long insertUsuario(Usuario user) {
+    public long insertarUsuario(Usuario user) {
         ContentValues values = new ContentValues();
         values.put(mySQLite.ID, user.getCodigo());
         values.put(mySQLite.NOMBRE, user.getNombre());
@@ -56,15 +56,17 @@ public class GestorBD {
         return sqlLiteWritable.insert(mySQLite.TABLE_NAME, null, values);
     }
 
-    public boolean cambiarEstadoUsuario(String codigo, boolean estaActivo) {
+    // Insertar el hospital
+    public long insertarHospital(Hospital hospital) {
         ContentValues values = new ContentValues();
-        values.put(mySQLite.ESTADO_ACTIVO, estaActivo ? 1 : 0);
-        int filasAfectadas = sqlLiteWritable.update(mySQLite.TABLE_NAME, values,
-                mySQLite.ID + " = ?", new String[]{String.valueOf(codigo)});
-        return filasAfectadas > 0;
+        values.put("codigo", hospital.getCodigo());
+        values.put("nombre", hospital.getNombre());
+        return sqlLiteWritable.insert("hospital", null, values);
     }
 
-    public boolean isTableNotEmpty() {
+
+
+    public boolean verificarTabla_vacia() {
         Cursor cursor = null;
         try {
             cursor = sqlLiteWritable.rawQuery("SELECT COUNT(*) FROM " + mySQLite.TABLE_NAME, null);
@@ -81,49 +83,15 @@ public class GestorBD {
     }
 
 
-
-    public boolean isUserActive(String codigo) {
-        Cursor cursor = sqlLiteWritable.query(MySQLite.TABLE_NAME,
-                new String[]{MySQLite.ESTADO_ACTIVO},
-                MySQLite.ID + " = ?",
-                new String[]{String.valueOf(codigo)},
-                null, null, null);
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                @SuppressLint("Range") int activo = cursor.getInt(cursor.getColumnIndex(MySQLite.ESTADO_ACTIVO));
-                cursor.close();
-                return activo == 1;
-            }
-            cursor.close();
-        }
-        return false;
-    }
-
-    public String nombreCompletoUsuario() {
-        String fullName = null;
-        Cursor cursor = sqlLiteWritable.query(mySQLite.TABLE_NAME,
-                new String[]{mySQLite.NOMBRE, mySQLite.APELLIDO},
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                @SuppressLint("Range") String nombre = cursor.getString(cursor.getColumnIndex(MySQLite.NOMBRE));
-                @SuppressLint("Range") String apellido = cursor.getString(cursor.getColumnIndex(MySQLite.APELLIDO));
-                fullName = nombre + " " + apellido;
-            }
-            cursor.close();
-        }
-        return fullName;
-    }
     public DatabaseReference getPersonalReference(){
         return FirebaseDatabase.getInstance().getReference("personal");
     }
-
+    public DatabaseReference getHospitalReference(){
+        return FirebaseDatabase.getInstance().getReference("hospitales");
+    }
+    public DatabaseReference getMensajeReference(){
+        return FirebaseDatabase.getInstance().getReference("mensaje");
+    }
     public DatabaseReference getmDatabase() {
         return mDatabase;
     }

@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/barrerahospitallogo" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/nombreMensaje"
         style="@style/Widget.AppCompat.TextView"
         android:layout_width="230dp"
         android:layout_height="wrap_content"
@@ -40,4 +40,38 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/barrita" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMensaje"
+        android:layout_width="417dp"
+        android:layout_height="482dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.775" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/barramensaje" />
+
+    <EditText
+        android:id="@+id/mensajeTxt"
+        android:layout_width="256dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="4dp"
+        android:ems="10"
+        android:hint="Escribe Mensaje"
+        android:inputType="text"
+        android:textColorHint="#757171"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

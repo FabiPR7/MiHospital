@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         miGestor = new GestorBD(this);
+        miGestor.getMySQLite().crarTodo(miGestor.getDatabase());
         estaRegistrado();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void estaRegistrado(){
-        if (miGestor.isTableNotEmpty()){
+        if (miGestor.verificarTabla_vacia()){
             Intent i = new Intent(MainActivity.this, MenuPrincipal.class);
             startActivity(i);
         }

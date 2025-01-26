@@ -73,11 +73,7 @@ public class PersonalActivty extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                buscar(success -> {
-                    if(success){
-
-                    }
-                });
+                buscar();
             }
 
             @Override
@@ -91,11 +87,12 @@ public class PersonalActivty extends AppCompatActivity {
             return insets;
         });
     }
-    public void activityMensaje(){
+    public void activityMensaje( ){
         Intent i = new Intent(PersonalActivty.this, MensajeActivity.class);
+     //  i.putExtra("codigo",codigo);
         startActivity(i);
     }
-    public void buscar(PersonalRepository.OnCompleteListener listener){
+    public void buscar(){
         String buscar = buscador.getText().toString().toLowerCase();
         HashSet<Personal> personalBuscado = new HashSet<>();
         if (!buscar.isEmpty()){

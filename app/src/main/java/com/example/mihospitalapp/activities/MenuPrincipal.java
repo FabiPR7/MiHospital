@@ -1,7 +1,6 @@
 package com.example.mihospitalapp.activities;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -17,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mihospitalapp.R;
 import com.example.mihospitalapp.modelo.GestorBD;
+import com.example.mihospitalapp.modelo.Hospital;
 import com.example.mihospitalapp.modelo.HospitalRepository;
 import com.example.mihospitalapp.modelo.PersonalRepository;
 import com.example.mihospitalapp.modelo.UsuarioRepository;
@@ -31,7 +31,7 @@ public class MenuPrincipal extends AppCompatActivity {
     private HospitalRepository hr;
     private String codigoPersonal;
     private GestorBD gestorBD;
-
+    public boolean nombreH = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +58,7 @@ public class MenuPrincipal extends AppCompatActivity {
                 activityPersonal();
             }
         });
-        if (gestorBD.isUserActive(codigoPersonal)){
+        if (ur.verificaEstadoUsuario(codigoPersonal,gestorBD)){
             aSwitchMenu.setChecked(true);
         }
         verificarSwitch();
@@ -81,15 +81,9 @@ public class MenuPrincipal extends AppCompatActivity {
 
     public void colocarNombres(){
         String nombreCompleto = ur.nombreCompletoUsuario(gestorBD);
+        String nombreHospital = hr.nombreHospitalMysqlite(gestorBD);
         nombre.setText(nombreCompleto);
-        hr.obtenerNombreHospital(hr.obtenerCodigoHospital(codigoPersonal), success -> {
-            if (success) {
-                System.out.println("ChachiPiruli");
-                hospital.setText(hr.getNombreHospital());
-            } else {
-                System.out.println("Error o datos no encontrados.");
-            }
-        });
+        hospital.setText(nombreHospital);
     }
 
     public void verificarSwitch(){
@@ -105,13 +99,13 @@ public class MenuPrincipal extends AppCompatActivity {
       if (!aSwitchMenu.isChecked()){
         view.setVisibility(View.INVISIBLE);
         view.setEnabled(false);
-        gestorBD.cambiarEstadoUsuario(ur.obtenerCodigo(gestorBD),false);
+        ur.cambiarEstadoUsuario(ur.obtenerCodigo(gestorBD),false,gestorBD);
        ur.cambiarEstadoFirebase(codigoPersonal,"no activo",gestorBD);
       }
       else {
           view.setVisibility(View.VISIBLE);
           view.setEnabled(true);
-          gestorBD.cambiarEstadoUsuario(codigoPersonal,true);
+          ur.cambiarEstadoUsuario(codigoPersonal,true,gestorBD);
           ur.cambiarEstadoFirebase(codigoPersonal,"activo",gestorBD);
       }
     }
