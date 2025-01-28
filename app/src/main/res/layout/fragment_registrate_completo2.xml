@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".fragments.registrateCompleto2">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -110,7 +110,7 @@
             android:id="@+id/aceptarButton2"
             android:layout_width="153dp"
             android:layout_height="62dp"
-            android:layout_marginTop="496dp"
+            android:layout_marginTop="492dp"
             android:layout_marginEnd="92dp"
             android:text="ACEPTAR"
             app:layout_constraintEnd_toEndOf="parent"

@@ -1,5 +1,6 @@
 package com.example.mihospitalapp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,10 +16,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.mihospitalapp.R;
+import com.example.mihospitalapp.activities.MenuPrincipal;
 import com.example.mihospitalapp.modelo.GestorBD;
 import com.example.mihospitalapp.modelo.Hospital;
 import com.example.mihospitalapp.modelo.HospitalRepository;
 import com.example.mihospitalapp.modelo.Usuario;
+import com.example.mihospitalapp.run.MainActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -56,7 +59,6 @@ public class registrarCompleto extends Fragment {
         aceptar = view.findViewById(R.id.aceptarButton1);
         hr = new HospitalRepository();
         miGestor = new GestorBD(getContext());
-
         aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,6 +113,8 @@ public class registrarCompleto extends Fragment {
                                     }
                                 });
                         miGestor.insertarUsuario(user);
+                        Intent i = new Intent(getContext(), MenuPrincipal.class);
+                        startActivity(i);
                         break;
                     }
                 }

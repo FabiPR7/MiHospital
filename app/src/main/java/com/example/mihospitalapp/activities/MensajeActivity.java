@@ -45,10 +45,12 @@ public class MensajeActivity extends AppCompatActivity {
         mr = new MensajeRepository();
         ur = new UsuarioRepository();
         gestorBD = new GestorBD(this);
-       //Bundle bundle = getIntent().getExtras();
-       // contacto = bundle.getString("codigo");
-       //LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-     //   recycler.setLayoutManager(linearLayoutManager);
+       Bundle bundle = getIntent().getExtras();
+        contacto = bundle.getString("codigo");
+        System.out.println(contacto);
+       LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recycler.setLayoutManager(linearLayoutManager);
+        cargarMensajes();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -57,16 +59,31 @@ public class MensajeActivity extends AppCompatActivity {
     }
 
     public void cargarMensajes(){
-        mr.recibirMensajes(gestorBD,contacto, ur.obtenerCodigo(gestorBD),success -> {
-            if (success){
-                System.out.println("FUNCIONAN LOS MENSAJES");
-                mensajes = mr.getMensajesRecibidos();
-                recycler.setAdapter(new miAdapter());
-            }
-            else{
-                System.out.println("NO FUNCIONO");
-            }
-        });
+        if (contacto.contains("-")){
+            mr.recibirMensajes(gestorBD,contacto, ur.obtenerCodigo(gestorBD),success -> {
+                if (success){
+                    System.out.println("FUNCIONAN LOS MENSAJES");
+                    mensajes = mr.getMensajesRecibidos();
+                    System.out.println(mensajes.length);
+                    recycler.setAdapter(new miAdapter());
+                }
+                else{
+                    System.out.println("NO FUNCIONO");
+                }
+            });
+        }else{
+            mr.recibirMensajes(gestorBD,contacto, contacto,success -> {
+                if (success){
+                    System.out.println("FUNCIONAN LOS MENSAJES");
+                    mensajes = mr.getMensajesRecibidos();
+                    System.out.println(mensajes.length);
+                    recycler.setAdapter(new miAdapter());
+                }
+                else{
+                    System.out.println("NO FUNCIONO");
+                }
+            });
+        }
     }
 
     private class miAdapter extends RecyclerView.Adapter<miAdapter.miAdapterHolder> {

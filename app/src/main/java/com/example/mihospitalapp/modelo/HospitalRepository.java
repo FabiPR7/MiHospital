@@ -48,6 +48,7 @@ public class HospitalRepository {
         }
     }
 
+
     public String obtenerCodigoHospital(String codigo){
         String[] codigoSplit = codigo.split("-");
         return codigoSplit[0];
@@ -87,7 +88,7 @@ public class HospitalRepository {
         );
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                @SuppressLint("Range") String codigoH = cursor.getString(cursor.getColumnIndex("nombre"));
+                @SuppressLint("Range") String codigoH = cursor.getString(cursor.getColumnIndex("codigo"));
                 codigo = codigoH;
             }
             cursor.close();

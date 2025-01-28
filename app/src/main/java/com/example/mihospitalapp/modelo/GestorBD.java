@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -16,7 +17,9 @@ public class GestorBD {
     private SQLiteDatabase sqlLiteWritable;
     private MySQLite mySQLite;
 
+
     public GestorBD(Context context){
+        FirebaseApp.initializeApp(context);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mySQLite = new MySQLite(context);
         sqlLiteWritable = mySQLite.getWritableDatabase();
@@ -90,7 +93,7 @@ public class GestorBD {
         return FirebaseDatabase.getInstance().getReference("hospitales");
     }
     public DatabaseReference getMensajeReference(){
-        return FirebaseDatabase.getInstance().getReference("mensaje");
+        return FirebaseDatabase.getInstance().getReference("mensajes");
     }
     public DatabaseReference getmDatabase() {
         return mDatabase;

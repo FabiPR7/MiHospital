@@ -62,7 +62,6 @@ public class registrateCompleto2 extends Fragment {
         hospitalCodes = new ArrayList<>();
         personalCodes = new ArrayList<>();
         migestor = new GestorBD(getContext());
-        // Obtener códigos de hospital
         aceptar = view.findViewById(R.id.aceptarButton2);
         fetchHospitalCodes(success -> {
             if (success) {
@@ -89,6 +88,7 @@ public class registrateCompleto2 extends Fragment {
         iniciarsesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 cambiarFragment(view);
             }
         });
@@ -99,8 +99,7 @@ public class registrateCompleto2 extends Fragment {
     }
 
     private void fetchHospitalCodes(OnCompleteListener listener) {
-        DatabaseReference hospitales = FirebaseDatabase.getInstance().getReference("hospitales");
-        hospitales.addValueEventListener(new ValueEventListener() {
+     migestor.getHospitalReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 hospitalCodes.clear(); // Limpiar lista para evitar duplicados
@@ -108,14 +107,18 @@ public class registrateCompleto2 extends Fragment {
                     String codigo = hospitalSnapshot.child("codigo").getValue(String.class);
                     if (codigo != null) {
                         hospitalCodes.add(codigo);
+                        System.out.println(codigo);
                     }
                 }
                 listener.onComplete(true);
                 Log .d("HospitalCodes", "Códigos: " + hospitalCodes);
+                Toast.makeText(getContext(), "CODIGOS ENCONTRADOS", Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "NO HAY DATOS", Toast.LENGTH_SHORT).show();
                 Log.e("FirebaseError", "Error al obtener los datos: " + error.getMessage());
             listener.onComplete(false);
             }
@@ -123,8 +126,7 @@ public class registrateCompleto2 extends Fragment {
     }
 
     private void fetchPersonalCodes(OnCompleteListener listener) {
-        DatabaseReference hospitales = FirebaseDatabase.getInstance().getReference("personal");
-        hospitales.addValueEventListener(new ValueEventListener() {
+        migestor.getPersonalReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 personalCodes.clear(); // Limpiar lista para evitar duplicados
@@ -135,7 +137,7 @@ public class registrateCompleto2 extends Fragment {
                     }
                 }
                 listener.onComplete(true);
-                Log .d("HospitalCodes", "Códigos: " + hospitalCodes);
+                System.out.println("HospitalCodes Códigos: " + hospitalCodes);
             }
 
             @Override
@@ -201,8 +203,6 @@ public class registrateCompleto2 extends Fragment {
             return false;
         }
         String[] codes = codigo.getText().toString().split("-");
-        System.out.println("-"+codes[1]+"-");
-        System.out.println("-"+codes[0]+"-");
        boolean codigoPersonalFomrato = Pattern.matches("^\\d{4}$", codes[1]);
         if (!codigoPersonalFomrato){
             Toast.makeText(this.getContext(), "Formato de codigo personal", Toast.LENGTH_SHORT).show();
@@ -218,9 +218,9 @@ public class registrateCompleto2 extends Fragment {
             Toast.makeText(this.getContext(), "Formato de codigo de hospital incorrecto", Toast.LENGTH_SHORT).show();
             return false;
         }
-        boolean codigoHospital = hospitalCodes.contains(codes[0]);
+        boolean codigoHospital = false;
         if (!codigoHospital){
-            Toast.makeText(this.getContext(), "Codigo Incorrecto (no hay hospital con este codigo)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), "Tu codigo "+codes[0] +" (Los esperados son)"+hospitalCodes.toString(), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

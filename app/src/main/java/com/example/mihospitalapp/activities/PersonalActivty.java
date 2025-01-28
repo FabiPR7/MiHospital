@@ -58,7 +58,7 @@ public class PersonalActivty extends AppCompatActivity {
         mensajeButon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activityMensaje();
+                activityMensaje(hr.codigoHospitalMysqlite(gestorBD));
             }
         });
        recyclerView = findViewById(R.id.recyclerPersonal);
@@ -87,9 +87,9 @@ public class PersonalActivty extends AppCompatActivity {
             return insets;
         });
     }
-    public void activityMensaje( ){
+    public void activityMensaje(String codigo ){
         Intent i = new Intent(PersonalActivty.this, MensajeActivity.class);
-     //  i.putExtra("codigo",codigo);
+        i.putExtra("codigo",codigo);
         startActivity(i);
     }
     public void buscar(){

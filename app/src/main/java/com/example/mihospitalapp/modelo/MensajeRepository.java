@@ -47,18 +47,18 @@ public class MensajeRepository {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Mensaje> mensajes = new ArrayList<>();
+                System.out.println("Leeyendo");
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     Mensaje mensaje = childSnapshot.getValue(Mensaje.class);
-                    if (mensaje != null && receptor.equals(mensaje.getReceptor())) {
-                        mensajes.add(mensaje);
-                    }
+                    mensajes.add(mensaje);
                 }
                 // Procesar los mensajes recuperados
                 for (Mensaje mensaje : mensajes) {
                     System.out.println("Mensaje recibido: " + mensaje.getContenido());
                 }
-                listener.onComplete(true);
                 mensajesRecibidos = mensajes.toArray(new Mensaje[0]);
+                listener.onComplete(true);
+
             }
 
             @Override

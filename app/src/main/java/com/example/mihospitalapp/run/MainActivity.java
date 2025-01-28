@@ -19,7 +19,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
-    private GestorBD miGestor;
+    public GestorBD miGestor;
     private Button b;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
